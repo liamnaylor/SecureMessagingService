@@ -1,0 +1,293 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+
+public class UI extends Application{
+	// This section used to create distinct features for the program including the labels, arrays and buttons.
+    Label labelName = new Label("Name");
+    Label labelMessages = new Label("Compose ");
+    Label labelReceived = new Label("Messages");
+    Label labelTitle = new Label();
+    Label labelActiveUser = new Label("Active User");
+    Label errorLabel = new Label("");
+    Label labelEmail = new Label("Email");
+
+    
+    ArrayList<String> userList = new ArrayList<>();
+    ArrayList<String> chatMessages = new ArrayList<>();
+
+    
+    ListView<String> userListView = new ListView<String>();
+    ListView<String> messageListView = new ListView<String>();
+
+    ObservableList<String> userItems = FXCollections.observableArrayList (userList);
+    ObservableList<String> messageItem = FXCollections.observableArrayList (chatMessages);
+
+
+    
+    TextField name = new TextField();
+    TextField email = new TextField();
+    TextArea ComposeMessage = new TextArea();
+
+    
+    Button join = new Button("Join");
+    Button send = new Button("Send");
+    Button exit = new Button("Exit");
+
+    
+    DataOutputStream dataOutputStream;
+    DataInputStream dataInputStream;
+
+    boolean joined = false;
+    
+    private Socket socket;
+
+    
+    
+
+
+    @Override   
+    public void start(Stage primaryStage)  {
+    	
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(10));
+
+       
+        Font titleFont = new Font("Arial Rounded MT",20);
+        labelTitle.setText("Lockdown Chat");
+        labelTitle.setFont(titleFont);
+        Color titleColor = new Color(0.1, 0, 0.5,1);
+        labelTitle.setTextFill(titleColor);
+        
+        name.setPromptText("Enter User Name");
+        ComposeMessage.setPromptText("Enter your Message");
+
+        ComposeMessage.setPrefHeight(2*(name.getHeight()));
+        ComposeMessage.setPrefWidth(250);
+        
+        GridPane centre = new GridPane();
+        centre.setPadding(new Insets(10));
+        centre.setHgap(20);
+        centre.setVgap(10);
+        
+        centre.add(labelName,0,0);
+        centre.add(name,1,0);
+        centre.add(join,2,0);
+        centre.add(labelReceived,0,2);
+        centre.add(errorLabel,1,1,2,1);
+        centre.add(messageListView,1,2,2,1);
+        
+        messageListView.setItems(messageItem);
+        userListView.setItems(userItems);
+        
+        userListView.setEditable(false);
+        messageListView.setEditable(false);
+        
+        userListView.setMaxWidth(180);
+        userListView.setMaxHeight(250);
+
+        // VBox has allowed us to create the vertical list layout
+        VBox rightVBox = new VBox();
+        rightVBox.setPadding(new Insets(20,0,10,0));
+        rightVBox.setSpacing(10);
+        rightVBox.getChildren().addAll(labelActiveUser,userListView);
+        borderPane.setRight(rightVBox);
+
+
+        
+        GridPane bottomGridPane = new GridPane();
+        bottomGridPane.add(labelMessages,0,0);
+        bottomGridPane.add(ComposeMessage,1,0);
+        bottomGridPane.add(send,4,0);
+        bottomGridPane.add(exit,7,0);
+        bottomGridPane.setHgap(20);
+        bottomGridPane.setPadding(new Insets(10,0,10,10));
+        send.setAlignment(Pos.BASELINE_RIGHT);
+
+        borderPane.setTop(labelTitle);
+        borderPane.setAlignment(labelTitle,Pos.CENTER);
+
+        borderPane.setCenter(centre);
+
+        borderPane.setBottom(bottomGridPane);
+
+        
+        Scene scene = new Scene(borderPane,580,400);
+        primaryStage.setScene(scene); //Setting scene.
+        primaryStage.setTitle("Welcome to Lockdown Chat"); //Setting title.
+        primaryStage.show();    //Display Stage.
+
+        
+        primaryStage.setOnCloseRequest(t -> closeSocketExit());
+        
+        send.setVisible(true);
+
+        
+        
+        
+
+        
+    }
+
+
+    
+    private void closeSocketExit() {
+        try {
+            if(socket!=null){
+                socket.close();
+            }
+            Platform.exit();    // Close UI.
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+/* Below sections ignore for now it was just me getting a bit carried away with programming
+
+ 
+//    public void receiveMessages(){
+//        try{
+//            while(connection){
+//                String message;
+//                
+//
+//                if(!joined){
+//                    addUserName();
+//                }
+//                
+//                else{
+//                    
+//                    message = dataInputStream.readUTF();
+//                    if(message.startsWith("[")){
+//                        addMessageToUserListView(message);
+//                    }
+//                    else{
+//                    
+//                        Platform.runLater(() -> {
+//                            messageItem.add(message);
+//                        });
+//                    }
+//                }
+//            }
+//        } catch (IOException ex) {
+//            System.out.println("Socket is closed.receive");
+//            Platform.runLater(() -> {
+//                errorLabel.setTextFill(Color.RED);
+//                errorLabel.setText("Unable to establish connection.");
+//            });
+//            connection = false;
+//        }
+//    }
+//    private void joinChat(){
+//        userName = name.getText();
+//        if(userName.contains(",")){
+//            Platform.runLater(() -> {
+//                // Update UI here.
+//                errorLabel.setTextFill(Color.RED);
+//                errorLabel.setText("Cannot contain ','.");
+//            });
+//        }
+//        else{
+//            try {
+//                dataOutputStream.writeUTF(userName);
+//            }
+//            catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+//
+//
+//    /*
+//    This method recreate an arrayList from the message and
+//    add the name to the userListView excluding its own name
+//    as it is not useful information.
+//     */
+//    private void addMessageToUserListView(String s) {
+//        List<String> list =Arrays.asList(s.substring(1, s.length() - 1).split(", ")
+//        );
+//        Platform.runLater(() -> {
+//            // Update UI here.
+//            userItems.clear();
+//            for(int i = 0; i < list.size(); i++){
+//                if(!(list.get(i).equals(userName))){
+//                    userItems.add(list.get(i));
+//                }
+//            }
+//        });
+//    }
+//
+//    private void addUserName()  {
+//        String response;
+//        try {
+//            response = dataInputStream.readUTF();
+//            if (response.startsWith("Accepted")){
+//                joined = true;
+//                Platform.runLater(() -> {
+//                    System.out.println("User Connected as "+ userName);
+//                    send.setDisable(false);
+//                    join.setDisable(true);
+//                    name.setEditable(false);
+//                    errorLabel.setTextFill(Color.GREEN);
+//                    errorLabel.setText("Joined as " + userName);
+//                });
+//            }
+//            else if(response.equals(userName)){
+//                Platform.runLater(() -> {
+//                    name.clear();
+//                    errorLabel.setTextFill(Color.RED);
+//                    errorLabel.setText("User with same name exist.");
+//                });
+//            }
+//        } catch (IOException e) {
+//            System.out.println("Socket is closed.add");
+//            Platform.runLater(() -> {
+//                errorLabel.setTextFill(Color.RED);
+//                errorLabel.setText("Unable to establish connection.");
+//                connection = false;
+//            });
+//        }
+//    }
+//
+//
+//    private void process() {
+//        try {
+//            // Get the text from the text field
+//            String string = name.getText().trim() + ":\n " +
+//                     ComposeMessage.getText().trim();
+//
+//            
+//            dataOutputStream.writeUTF(string);
+//
+//            // Clear text area.
+//            ComposeMessage.setText("");
+//        }
+//        catch (IOException ex) {
+//            System.err.println(ex);
+//        }
+//    }
+
+}
