@@ -1,93 +1,120 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.*;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import java.util.*;
+
+public class LogScreen implements ActionListener{
+	JFrame frame = new JFrame();
+	JLabel label = new JLabel("Username:");
+	JLabel lockChat;
+	JTextField userIn = new JTextField(40);
+	JLabel passLab = new JLabel("Password:");
+	JPasswordField passIn = new JPasswordField(40);
+	JButton sub = new JButton("Submit");
+	JLabel greatSuccess = new JLabel("");
+	
+	
+	HashMap<String,String> logIns = new HashMap<String,String>();
+	LogScreen(HashMap<String,String> logInfo){
+		logIns = logInfo;
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			
+			JFrame frame = new JFrame();
+			frame.setSize(420,420);
+			frame.setLayout(null);
+
+			label.setBounds(50,100,75,25);		
+			userIn.setBounds(125,100,200,25);
+			passLab.setBounds(50,150,75,25);
+			
+			passIn.setBounds(125,150,200,25);
+			sub.setBounds(125,200,100,25);
+			sub.addActionListener(this);
+			greatSuccess.setBounds(150,300,300,25);
+			
+			frame.add(label);
+			frame.add(passLab);
+			frame.add(sub);
+			frame.add(passIn);
+			frame.add(userIn);
+			frame.add(greatSuccess);
+//			
+			frame.setVisible(true);
+	}
+// Button functionality
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			if(e.getSource()== sub) {
+				String name = userIn.getText();
+				String pass = String.valueOf(passIn.getPassword());
+				
+				if(logIns.containsKey(name)) {
+					if(logIns.get(name).equals(pass)) {
+						greatSuccess.setForeground(Color.GREEN);
+						greatSuccess.setText("Access Granted");
+						frame.dispose();
+						UI next = new UI();
+					}
+					else {
+						greatSuccess.setForeground(Color.RED);
+						greatSuccess.setText("INCORRECT TRY AGAIN!!!");
+					}
+					
+				}
+				else {
+					greatSuccess.setText("User Not Found");
+				}
+				
+			}
+			
+		}
+	}
+	
+---------------------------------------------------Start of ID storage class--------------------------------------------
+
+import java.util.*;
+
+public class IDInfo {
+	HashMap<String,String> logIns = new HashMap<String,String>();
+	
+	IDInfo(){
+		logIns.put("Liam","password123");
+		logIns.put("Sotiris","12345s");
+		logIns.put("Alex","Password");
+		logIns.put("Megyn","pass");
+	}
+	
+	protected HashMap getLogin() {
+		return logIns;
+	}
+}
+
+---------------------------------------------------Start of Main class--------------------------------------------
+
+import java.awt.Font;
 import java.awt.event.*;
 import javax.swing.*;
 
 import javafx.geometry.Insets;
 import javafx.scene.layout.GridPane;
 
-public class UILogin implements ActionListener {
-	
-	private static JLabel label;
-	private static JTextField userIn;
-	private static JLabel passLab;
-	private static JPasswordField passIn;
-	private static JButton sub;
-	private static JLabel greatSuccess;
+public class UILogin {
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		JFrame frame = new JFrame();
-		frame.setSize(800,500);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
+		IDInfo ids = new IDInfo();
 		
-		JPanel panel= new JPanel();
-		frame.add(panel);
-		panel.setLayout(null);
-		
-		label = new JLabel("Username:");
-		label.setBounds(10,20,80,25);
-		panel.add(label);
-		
-		userIn = new JTextField(40);
-		userIn.setBounds(100,20,165,25);
-		panel.add(userIn);
-		
-		passLab = new JLabel("Password:");
-		passLab.setBounds(10,50,80,25);
-		panel.add(passLab);
-		
-		passIn = new JPasswordField(40);
-		passIn.setBounds(100,50,165,25);
-		panel.add(passIn);
-		
-		sub = new JButton("Submit");
-		sub.setBounds(10,80,80,25);
-		sub.addActionListener(new UILogin());
-		panel.add(sub);
-		
-		greatSuccess = new JLabel("");
-		greatSuccess.setBounds(10,110,300,25);
-		panel.add(greatSuccess);
-		
-//		GridPane centre = new GridPane();
-//        centre.setPadding(new Insets(10));
-//        centre.setHgap(20);
-//        centre.setVgap(10);
-        
-		
-		frame.add(panel);
-//		centre.add(panel);
-		frame.setVisible(true);
+		LogScreen login = new LogScreen(ids.getLogin());
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		String userCred = userIn.getText();
-		String passCred = passIn.getText();
-		
-		if(userCred.equals("Liam") && passCred.equals("password123")) {
-			greatSuccess.setText("Access Granted");
-			
-		}
-//		else if(userCred.equals("Alex") && passCred.equals("password123")) {
-//			greatSuccess.setText("Access Granted");
-//			
-//		}
-//		else if(userCred.equals("Sotiris") && passCred.equals("password123")) {
-//			greatSuccess.setText("Access Granted");
-//			
-//		}
-//		if(userCred.equals("Megyn") && passCred.equals("password123")) {
-//			greatSuccess.setText("Access Granted");
-//			
-//		}
-		else {
-			
-			greatSuccess.setText(userCred + " is invalid");
-			
-		}
-		
-	}
+	
 	
 }
