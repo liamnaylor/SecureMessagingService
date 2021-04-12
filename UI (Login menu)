@@ -62,7 +62,7 @@ public class LogScreen implements ActionListener{
 						greatSuccess.setForeground(Color.GREEN);
 						greatSuccess.setText("Access Granted");
 						frame.dispose();
-						UI next = new UI();
+						UI next = new UI(); //This is the start of my attempt to load into the chat room
 					}
 					else {
 						greatSuccess.setForeground(Color.RED);
